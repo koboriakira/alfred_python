@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from slack_sdk import WebClient
 
 HOME = str(Path.home())
+JST = timezone(timedelta(hours=+9), "JST")
 
 # 1. dotenvの読み込み
 load_dotenv(f"{HOME}/git/alfred_python/.env")
@@ -70,14 +71,15 @@ def post_to_inbox(query: str) -> None:
 
 
 def get_now() -> datetime:
-    return datetime.now(timezone(timedelta(hours=+9), "JST"))
+    return datetime.now(JST)
 
 
 def get_today() -> date:
-    # 現時刻を取得
+    """
+    今日の日付を取得する
+    ただし、翌日の2時までは今日とする
+    """
     now = get_now()
-
-    # 今日の日付を取得。ただし翌日2時までは今日とする
     today = now - timedelta(days=1) if now.hour < 2 else now  # noqa: PLR2004
     return today.date()
 
