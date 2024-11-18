@@ -8,5 +8,5 @@ import config
 
 if __name__ == "__main__":
     task_id = "{query}"
-    path = "/task/start/" + task_id
-    config.post_slack_concierge_api(path)
+    path = f"/task/{task_id}/start/"
+    config.post_notion_api(path, {})
