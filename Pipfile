@@ -5,8 +5,8 @@ name = "pypi"
 
 [packages]
 slack-sdk = "*"
-requests = "*"
 python-dotenv = "*"
+requests = "*"
 
 [dev-packages]
 
