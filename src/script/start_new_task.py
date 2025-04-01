@@ -47,9 +47,14 @@ def append_to_obsidian_daily_note(query: str) -> None:
         file.write(f"{prefix}- [ ] {query}\n")
 
 if __name__ == "__main__":
+    query = sys.argv[1] if len(sys.argv) > 1 else "新しいタスク"
+
+    # Add the query to the Obsidian daily note
+    append_to_obsidian_daily_note(query)
+
     start = config.get_now()
     end = start + timedelta(minutes=25)
-    query = sys.argv[1] if len(sys.argv) > 1 else "新しいタスク"
+
     body = {
         "title": query,
         "start_date": start.isoformat(),
@@ -57,6 +62,3 @@ if __name__ == "__main__":
         "status": "InProgress",
     }
     config.post_notion_api("/task/", body)
-
-    # Add the query to the Obsidian daily note
-    append_to_obsidian_daily_note(query)
