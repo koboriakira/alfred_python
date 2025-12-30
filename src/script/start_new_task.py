@@ -26,5 +26,16 @@ if __name__ == "__main__":
         "start_date": start.isoformat(),
         "status": "InProgress",
     }
-    config.post_notion_api("/task/", body)
+    response = config.post_notion_api("/task/", body)
     print(f"Created Notion task: {title}")
+    print(response["data"])
+    notion_page_url = response["data"]["url"]
+
+    # Obsidianのデイリーノートにタスクを追加
+    date_str = config.format_date_extended(start)
+    obsidian_daily_note_path = f"{config.OBSIDIAN_DIR}/dailynote/{date_str}.md"
+    print(f"Obsidian daily note path: {obsidian_daily_note_path}")
+    datetime_str = config.format_time_extended(start)
+    task_line = f"- [ ] ({datetime_str}開始) [{title}]({notion_page_url})\n"
+    with open(obsidian_daily_note_path, "a", encoding="utf-8") as f:
+        f.write(task_line)

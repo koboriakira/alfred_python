@@ -94,6 +94,69 @@ def get_today() -> date:
     return today.date()
 
 
+def format_time_extended(dt: datetime) -> str:
+    """
+    datetimeをHH:mm形式の文字列に変換する
+    ただし、深夜0時から6時までは24時間表記を超えた形式（24時、25時、26時など）で表示する
+
+    Args:
+        dt (datetime): 変換対象のdatetime
+
+    Returns:
+        str: HH:mm形式の時刻文字列
+
+    Examples:
+        >>> format_time_extended(datetime(2025, 1, 1, 0, 30))
+        '24:30'
+        >>> format_time_extended(datetime(2025, 1, 1, 1, 15))
+        '25:15'
+        >>> format_time_extended(datetime(2025, 1, 1, 5, 45))
+        '29:45'
+        >>> format_time_extended(datetime(2025, 1, 1, 6, 0))
+        '06:00'
+        >>> format_time_extended(datetime(2025, 1, 1, 15, 30))
+        '15:30'
+    """
+    hour = dt.hour
+    minute = dt.minute
+
+    # 0時から5時までは24時間を加算
+    if 0 <= hour < 6:
+        hour += 24
+
+    return f"{hour:02d}:{minute:02d}"
+
+
+def format_date_extended(dt: datetime) -> str:
+    """
+    datetimeをYYYY-MM-DD形式の文字列に変換する
+    ただし、深夜0時から6時までは前日の日付を返却する
+
+    Args:
+        dt (datetime): 変換対象のdatetime
+
+    Returns:
+        str: YYYY-MM-DD形式の日付文字列
+
+    Examples:
+        >>> format_date_extended(datetime(2025, 12, 31, 0, 30))
+        '2025-12-30'
+        >>> format_date_extended(datetime(2025, 12, 31, 1, 15))
+        '2025-12-30'
+        >>> format_date_extended(datetime(2025, 12, 31, 5, 45))
+        '2025-12-30'
+        >>> format_date_extended(datetime(2025, 12, 31, 6, 0))
+        '2025-12-31'
+        >>> format_date_extended(datetime(2025, 12, 31, 15, 30))
+        '2025-12-31'
+    """
+    # 0時から5時までは前日の日付を返す
+    if 0 <= dt.hour < 6:
+        dt = dt - timedelta(days=1)
+
+    return dt.strftime("%Y-%m-%d")
+
+
 def run_process(command: list[str], check: bool = False) -> str:
     """
     コマンドを実行し、標準出力を返す
