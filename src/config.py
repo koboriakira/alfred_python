@@ -30,7 +30,7 @@ SLACK_USER_TOKEN = os.environ.get("SLACK_USER_TOKEN", "")
 INBOX_CHANNEL = "C05GUTE35RU"  # inboxのチャンネルID
 GIT_PROJECT_DIR = f"{HOME}/git/alfred_python"
 BLOG_DIR = f"{HOME}/git/blog"
-OBSIDIAN_DIR = f"{HOME}/Library/Mobile Documents/iCloud~md~obsidian/Documents/Vault"
+OBSIDIAN_DIR = f"{HOME}/Library/Mobile Documents/iCloud~md~obsidian/Documents/my-vault"
 
 # 3. ライブラリを利用した汎用メソッドの定義
 
