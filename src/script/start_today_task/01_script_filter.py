@@ -42,7 +42,7 @@ def save_cache_items(items: list[dict]) -> None:
     }
     # resultをファイルに書き込む
     with open(JSON_FILEPATH, "w") as f:
-        json.dump(result, f)
+        json.dump(result, f, ensure_ascii=False)
 
 
 def read_cache_items() -> list[dict] | None:
