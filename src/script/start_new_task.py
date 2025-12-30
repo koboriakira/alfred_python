@@ -64,15 +64,17 @@ if __name__ == "__main__":
     config.post_notion_api("/task/", body)
 
     #`screenocr split "title"`コマンドを実行する
-    jsonl_file_path = config.run_process(
+    screenocr_result = config.run_process(
         ["screenocr", "split", f"\"{title}\""],
     )
+    # screenocr_resultの1行目をJSONLファイルパスとして取得
+    jsonl_file_path = Path(screenocr_result.strip().splitlines()[0])
 
     # Obsidianにタスクを作成
     config.create_obsidian_markdown(
         title=f"task_{title}",
         content="",
-        subdir="Tasks",
+        subdir="00_Task",
         frontmatter={
             "screenocr_jsonl": str(jsonl_file_path),
         },
