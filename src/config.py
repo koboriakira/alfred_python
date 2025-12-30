@@ -30,6 +30,7 @@ SLACK_USER_TOKEN = os.environ.get("SLACK_USER_TOKEN", "")
 INBOX_CHANNEL = "C05GUTE35RU"  # inboxのチャンネルID
 GIT_PROJECT_DIR = f"{HOME}/git/alfred_python"
 BLOG_DIR = f"{HOME}/git/blog"
+OBSIDIAN_DIR = f"{HOME}/Library/Mobile Documents/iCloud~md~obsidian/Documents/Vault"
 
 # 3. ライブラリを利用した汎用メソッドの定義
 
@@ -108,3 +109,45 @@ def filter_dict_list(items: list[dict], key: str, search_query: str) -> list[dic
             reverse=True,
         )
     return items
+
+
+def create_obsidian_markdown(
+    title: str,
+    content: str,
+    subdir: str = "",
+) -> Path:
+    """
+    OBSIDIAN_DIR以下に新規マークダウンファイルを作成する
+
+    Args:
+        title (str): ファイルタイトル（拡張子なし）
+        content (str): ファイルに書き込むテキスト内容
+        subdir (str): OBSIDIAN_DIR以下のサブディレクトリパス（オプション、デフォルトは空文字列）
+
+    Returns:
+        Path: 作成したファイルのパス
+
+    Raises:
+        ValueError: titleが空の場合
+    """
+    if not title:
+        raise ValueError("タイトルは空にできません")
+
+    # ファイル名にマークダウン拡張子を追加
+    filename = f"{title}.md"
+
+    # 保存先ディレクトリを決定
+    target_dir = Path(OBSIDIAN_DIR)
+    if subdir:
+        target_dir = target_dir / subdir
+
+    # ディレクトリが存在しない場合は作成
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    # ファイルパスを作成
+    file_path = target_dir / filename
+
+    # ファイルに書き込み
+    file_path.write_text(content, encoding="utf-8")
+
+    return file_path
