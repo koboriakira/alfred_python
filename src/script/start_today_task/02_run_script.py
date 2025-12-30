@@ -23,7 +23,20 @@ if __name__ == "__main__":
 
     path = f"/task/{task_id}/start/"
     start_response = config.post_notion_api(path, {})
+    print(start_response)
+
+    # Obsidianのデイリーノートにタスクを追加
+    title = get_task_title(start_response)
+    url = start_response["data"]["url"]
+    now = config.get_now()
+    date_str = config.format_date_extended(now)
+    obsidian_daily_note_path = f"{config.OBSIDIAN_DIR}/dailynote/{date_str}.md"
+    print(f"Obsidian daily note path: {obsidian_daily_note_path}")
+    datetime_str = config.format_time_extended(now)
+    task_line = f"- [ ] ({datetime_str}開始) [{title}]({url})\n"
+    with open(obsidian_daily_note_path, "a", encoding="utf-8") as f:
+        f.write(task_line)
+
 
     # 後続のスクリプトにタイトルを渡すために出力する
-    title = get_task_title(start_response)
     print(title)
