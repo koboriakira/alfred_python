@@ -1,5 +1,6 @@
 # よく利用される準備をまとめて行う
 
+from ast import DictComp
 import os
 import subprocess
 from datetime import date, datetime, timedelta, timezone
@@ -39,12 +40,19 @@ OBSIDIAN_DIR = f"{HOME}/Library/Mobile Documents/iCloud~md~obsidian/Documents/my
 def post_notion_api(
     path: str,
     body: dict,
-) -> None:
+) -> dict:
     headers = {
         "access-token": NOTION_SECRET,
     }
     url = LAMBDA_NOTION_API_DOMAIN + path
-    requests.post(url, json=body, timeout=10, headers=headers)
+    response = requests.post(url, json=body, timeout=10, headers=headers)
+    print(f"Notion API response status: {response.status_code}")
+    try:
+        print(f"Response content: {response.json()}")
+        return response.json()
+    except Exception as e:
+        print(f"Failed to parse Notion API response as JSON: {e}")
+        return {}
 
 
 def get_notion_api(
