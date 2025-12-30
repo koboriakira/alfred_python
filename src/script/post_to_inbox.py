@@ -12,9 +12,9 @@ if __name__ == "__main__":
     print(f"Text: {text}")
 
     # Slackのinboxチャンネルに投稿
-    # config.post_to_inbox(text)
+    config.post_to_inbox(text)
 
     # obsidianのinboxに追記
-    config.create_obsidian_markdown(
-        title=text, content="", subdir="00_Inbox"
-    )
+    # config.create_obsidian_markdown(
+    #     title=text, content="", subdir="00_Inbox"
+    # )
