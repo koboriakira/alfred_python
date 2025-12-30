@@ -1,3 +1,8 @@
+"""新しいタスクを開始し、Notionに登録するスクリプト。
+
+Obsidianのデイリーノートにタスクを追加し、
+NotionのタスクAPIに新しいタスクを作成します。
+"""
 from datetime import timedelta
 import os
 import sys
@@ -8,21 +13,16 @@ sys.path.append(f"{os.environ['HOME']}/git/alfred_python/src/")
 
 import config
 
-def append_to_obsidian_daily_note(query: str) -> None:
-    """
-    Append the query text to the end of today's Obsidian daily note.
-    If the file doesn't exist, this function silently does nothing.
+def append_to_obsidian_daily_note(title: str) -> None:
+    """タイトルテキストを今日のObsidianデイリーノートの末尾に追加する。
+
+    ファイルが存在しない場合、この関数は何もせずに終了します。
 
     Args:
-        query: The text to append to the daily note
+        title (str): デイリーノートに追加するテキスト
     """
     today = config.get_today().strftime("%Y-%m-%d")
-    obsidian_dir = os.environ.get("OBSIDIAN_DIR")
-
-    if not obsidian_dir:
-        return  # OBSIDIAN_DIR environment variable not set
-
-    daily_note_path = Path(f"{obsidian_dir}/my-vault/dailynote/{today}.md")
+    daily_note_path = Path(f"{config.OBSIDIAN_DIR}/dailynote/{today}.md")
 
     # Skip if the file doesn't exist
     if not daily_note_path.exists():
@@ -42,23 +42,39 @@ def append_to_obsidian_daily_note(query: str) -> None:
         # Empty file
         prefix = ''
 
-    # Append the query to the end of the file
+    # Append the link to the end of the file
     with open(daily_note_path, "a", encoding="utf-8") as file:
-        file.write(f"{prefix}- [ ] {query}\n")
+        task_filename = f"task_{title}"
+        task_link = f"[[{task_filename}|{title}]]"
+        file.write(f"{prefix}- [ ] {task_link}\n")
 
 if __name__ == "__main__":
-    query = sys.argv[1] if len(sys.argv) > 1 else "新しいタスク"
-
-    # Add the query to the Obsidian daily note
-    append_to_obsidian_daily_note(query)
-
+    if len(sys.argv) <= 1:
+        print("Usage: start_new_task.py <task_description>")
+        sys.exit(1)
+    title = sys.argv[1]
     start = config.get_now()
-    end = start + timedelta(minutes=25)
 
+    # Notionにタスクを作成
     body = {
-        "title": query,
+        "title": title,
         "start_date": start.isoformat(),
-        "end_date": end.isoformat(),
         "status": "InProgress",
     }
     config.post_notion_api("/task/", body)
+
+    #`screenocr split "title"`コマンドを実行する
+    jsonl_file_path = config.run_process(
+        ["screenocr", "split", f"\"{title}\""],
+    )
+
+    # Obsidianにタスクを作成
+    config.create_obsidian_markdown(
+        title=f"task_{title}",
+        content="",
+        subdir="Tasks",
+        frontmatter={
+            "screenocr_jsonl": str(jsonl_file_path),
+        },
+    )
+    append_to_obsidian_daily_note(title)

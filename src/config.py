@@ -5,6 +5,7 @@ import subprocess
 from datetime import date, datetime, timedelta, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
+from typing import Optional
 
 import requests
 from dotenv import load_dotenv
@@ -85,8 +86,19 @@ def get_today() -> date:
     return today.date()
 
 
-def run_process(command: list[str], check: bool = False) -> None:
-    subprocess.run(command, check=check)
+def run_process(command: list[str], check: bool = False) -> str:
+    """
+    コマンドを実行し、標準出力を返す
+
+    Args:
+        command (list[str]): 実行するコマンドのリスト
+        check (bool): コマンドが失敗した場合に例外を発生させるかどうか
+
+    Returns:
+        str: コマンドの標準出力
+    """
+    result = subprocess.run(command, check=check, capture_output=True, text=True)
+    return result.stdout
 
 
 def filter_dict_list(items: list[dict], key: str, search_query: str) -> list[dict]:
@@ -115,6 +127,7 @@ def create_obsidian_markdown(
     title: str,
     content: str,
     subdir: str = "",
+    frontmatter: Optional[dict] = None,
 ) -> Path:
     """
     OBSIDIAN_DIR以下に新規マークダウンファイルを作成する
@@ -123,6 +136,7 @@ def create_obsidian_markdown(
         title (str): ファイルタイトル（拡張子なし）
         content (str): ファイルに書き込むテキスト内容
         subdir (str): OBSIDIAN_DIR以下のサブディレクトリパス（オプション、デフォルトは空文字列）
+        frontmatter (dict | None): frontmatterとして追加するメタデータ（オプション）
 
     Returns:
         Path: 作成したファイルのパス
@@ -132,6 +146,18 @@ def create_obsidian_markdown(
     """
     if not title:
         raise ValueError("タイトルは空にできません")
+
+    # frontmatterが指定されている場合は、contentの前に追加
+    if frontmatter:
+        frontmatter_lines = ["---"]
+        for key, value in frontmatter.items():
+            # 値が文字列の場合はクォートで囲む
+            if isinstance(value, str):
+                frontmatter_lines.append(f'{key}: "{value}"')
+            else:
+                frontmatter_lines.append(f"{key}: {value}")
+        frontmatter_lines.append("---")
+        content = "\n".join(frontmatter_lines) + "\n\n" + content
 
     # ファイル名にマークダウン拡張子を追加
     filename = f"{title}.md"
