@@ -33,7 +33,7 @@ if __name__ == "__main__":
     obsidian_daily_note_path = f"{config.OBSIDIAN_DIR}/dailynote/{date_str}.md"
     print(f"Obsidian daily note path: {obsidian_daily_note_path}")
     datetime_str = config.format_time_extended(now)
-    task_line = f"- [ ] ({datetime_str}開始) [{title}]({url})\n"
+    task_line = f"({datetime_str}開始) [{title}]({url})\n"
     with open(obsidian_daily_note_path, "a", encoding="utf-8") as f:
         f.write(task_line)
 
