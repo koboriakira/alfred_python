@@ -23,10 +23,8 @@ if __name__ == "__main__":
     # Notionにタスクを作成
     body = {
         "title": title,
-        "start_date": start.isoformat(),
-        "status": "InProgress",
     }
-    response = config.post_notion_api("/task/", body)
+    response = config.post_notion_api("/todos/", body)
     print(f"Created Notion task: {title}")
     print(response["data"])
     notion_page_url = response["data"]["url"]
